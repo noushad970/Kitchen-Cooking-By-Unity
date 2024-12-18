@@ -1,17 +1,44 @@
+using System;
 using UnityEngine;
 
 public class Player : MonoBehaviour
 {
+    public static Player Instance { get; private set; }
+    public event EventHandler<OnSelectedCounterChangedEventArgs> OnSelectedCounterChanged;
+    public class OnSelectedCounterChangedEventArgs : EventArgs
+    {
+        public ClearCounter selectedCounter; 
+    }
     [SerializeField]private float moveSpeed=7f;
     [SerializeField] private GameInput gameInput;
     [SerializeField] private LayerMask counterLayerMask;
     private bool isWalking;
     private Vector3 lastInterectDir;
+    private ClearCounter selectedCounter;
     // Update is called once per frame
+    private void Awake()
+    {
+        if (Instance != null)
+        {
+            Debug.Log("There is more than one player instance");
+        }
+        Instance= this; 
+    }
+    private void Start()
+    {
+        gameInput.OnInteractAction += GameInput_OnInteractAction;
+    }
     private void Update()
     {
         HandleMovement();
         handleInteraction();
+    }
+    private void GameInput_OnInteractAction(object sender, System.EventArgs e)
+    {
+        if(selectedCounter != null)
+        {
+            selectedCounter.interect();
+        }
     }
     private void handleInteraction()
     {
@@ -25,11 +52,24 @@ public class Player : MonoBehaviour
         float interactionDistance = 2f;
         if (Physics.Raycast(transform.position, lastInterectDir, out RaycastHit rayCastHit, interactionDistance, counterLayerMask))
         {
-            Debug.Log("Object collide with: ", rayCastHit.transform);
-            if(rayCastHit.transform.TryGetComponent(out ClearCounter clearCounter))
+            Debug.Log("Object collide with: "+ rayCastHit.transform.name);
+            if (rayCastHit.transform.TryGetComponent(out ClearCounter clearCounter))
             {
-                clearCounter.interect();
+                //clearCounter.interect();
+                if (clearCounter != selectedCounter)
+                {
+                    selectingCounter(clearCounter);
+                }
+                
             }
+            else
+            {
+                selectingCounter(null);
+            }
+        }
+        else
+        {
+            selectingCounter(null);
         }
     }
     //this method will move a player and detect collision and collide with physics object with RayCapsule
@@ -78,5 +118,14 @@ public class Player : MonoBehaviour
     public bool IsWalking()
     {
         return isWalking;
+    }
+    private void selectingCounter(ClearCounter cc)
+    {
+        this.selectedCounter = cc;
+        OnSelectedCounterChanged?.Invoke(this, new OnSelectedCounterChangedEventArgs
+        {
+            selectedCounter = selectedCounter
+        });
+
     }
 }
