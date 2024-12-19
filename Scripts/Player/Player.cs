@@ -1,20 +1,22 @@
 using System;
 using UnityEngine;
 
-public class Player : MonoBehaviour
+public class Player : MonoBehaviour,IKitchenObjectParent
 {
     public static Player Instance { get; private set; }
     public event EventHandler<OnSelectedCounterChangedEventArgs> OnSelectedCounterChanged;
     public class OnSelectedCounterChangedEventArgs : EventArgs
     {
-        public ClearCounter selectedCounter; 
+        public BaseCounter selectedCounter; 
     }
     [SerializeField]private float moveSpeed=7f;
     [SerializeField] private GameInput gameInput;
     [SerializeField] private LayerMask counterLayerMask;
+    [SerializeField] private Transform counterTopPoint;
+    private KitchenObject kitchenObjectHoldPoint;
     private bool isWalking;
     private Vector3 lastInterectDir;
-    private ClearCounter selectedCounter;
+    private BaseCounter selectedCounter;
     // Update is called once per frame
     private void Awake()
     {
@@ -37,7 +39,7 @@ public class Player : MonoBehaviour
     {
         if(selectedCounter != null)
         {
-            selectedCounter.interect();
+            selectedCounter.interect(this);
         }
     }
     private void handleInteraction()
@@ -53,12 +55,12 @@ public class Player : MonoBehaviour
         if (Physics.Raycast(transform.position, lastInterectDir, out RaycastHit rayCastHit, interactionDistance, counterLayerMask))
         {
             Debug.Log("Object collide with: "+ rayCastHit.transform.name);
-            if (rayCastHit.transform.TryGetComponent(out ClearCounter clearCounter))
+            if (rayCastHit.transform.TryGetComponent(out BaseCounter baseCounter))
             {
-                //clearCounter.interect();
-                if (clearCounter != selectedCounter)
+                //kitchenObjectParent.interect();
+                if (baseCounter != selectedCounter)
                 {
-                    selectingCounter(clearCounter);
+                    selectingCounter(baseCounter);
                 }
                 
             }
@@ -119,13 +121,77 @@ public class Player : MonoBehaviour
     {
         return isWalking;
     }
-    private void selectingCounter(ClearCounter cc)
+    private void selectingCounter(BaseCounter baseCounter)
     {
-        this.selectedCounter = cc;
+        this.selectedCounter = baseCounter;
         OnSelectedCounterChanged?.Invoke(this, new OnSelectedCounterChangedEventArgs
         {
             selectedCounter = selectedCounter
         });
 
     }
+
+    //intarfaces
+    public Transform GetKitchenObjectFollowTransform()
+    {
+        return counterTopPoint;
+    }
+    public void setKitchenObject(KitchenObject kitchenObject)
+    {
+        this.kitchenObjectHoldPoint = kitchenObject;
+    }
+    public KitchenObject GetKitchenObject() { return kitchenObjectHoldPoint; }
+    public void clearKitchenObject() { kitchenObjectHoldPoint = null; }
+    public bool hasKitchenObject() { return kitchenObjectHoldPoint != null; }
 }
+/*
+ using System;
+using UnityEngine;
+
+public class ClearCounter : MonoBehaviour
+{
+    [SerializeField] private KitchenObjectSO kitchenObjectSO;
+    [SerializeField] private Transform counterTopPoint;
+    [SerializeField] private ClearCounter secondClearCounter;
+    [SerializeField] private bool testing;
+    private KitchenObject kitchenObjectHoldPoint;
+    private void Update()
+    {
+        if(testing && Input.GetKeyDown(KeyCode.T))
+        {
+            if(kitchenObjectHoldPoint != null)
+            {
+                kitchenObjectHoldPoint.setClearCounter(secondClearCounter);
+            }
+        }
+    }
+    public void interect()
+    {
+        if (kitchenObjectHoldPoint == null)
+        {
+            Transform kitchenObjectTransform = Instantiate(kitchenObjectSO.prefab, counterTopPoint);
+            kitchenObjectTransform.GetComponent<KitchenObject>().setClearCounter(this);
+            //kitchenObjectTransform.localPosition = Vector3.zero;
+            //kitchenObjectHoldPoint = kitchenObjectTransform.GetComponent<KitchenObject>();
+            //kitchenObjectHoldPoint.setClearCounter(this);
+        }
+        else
+        {
+            Debug.Log(kitchenObjectHoldPoint.getKitchenObj());
+        }
+    }
+
+    public Transform GetKitchenObjectFollowTransform()
+    {
+        return counterTopPoint;
+    }
+    public void setKitchenObject(KitchenObject kitchenObjectHoldPoint)
+    {
+        this.kitchenObjectHoldPoint = kitchenObjectHoldPoint; 
+    }
+    public KitchenObject GetKitchenObject() { return kitchenObjectHoldPoint; }
+    public void clearKitchenObject() { kitchenObjectHoldPoint=null; }
+    public bool hasKitchenObject(){ return kitchenObjectHoldPoint != null;}
+}
+
+ */
