@@ -29,7 +29,7 @@ public class Player : MonoBehaviour,IKitchenObjectParent
     private void Start()
     {
         gameInput.OnInteractAction += GameInput_OnInteractAction;
-        gameInput.OnInteractAction += GameInput_OnInteractActionAlternate;
+        gameInput.OnInteractAlternateAction += GameInput_OnInteractActionAlternate;
     }
     private void Update()
     {
@@ -186,7 +186,7 @@ public class ClearCounter : MonoBehaviour
         }
         else
         {
-            Debug.Log(kitchenObjectHoldPoint.getKitchenObj());
+            Debug.Log(kitchenObjectHoldPoint.getKitchenObjSO());
         }
     }
 
