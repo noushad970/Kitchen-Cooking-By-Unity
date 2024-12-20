@@ -1,8 +1,6 @@
-
-using System;
 using UnityEngine;
 
-public class ClearCounter : BaseCounter
+public class CuttingCounter : BaseCounter
 {
     public override void interect(Player player)
     {
@@ -29,5 +27,11 @@ public class ClearCounter : BaseCounter
             }
         }
     }
+    public override void interctAlternate(Player player)
+    {
+        if(hasKitchenObject())
+        {
 
+        }
+    }
 }
