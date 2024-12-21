@@ -34,7 +34,15 @@ public class CuttingCounter : BaseCounter,IHasProgress
         {
             if (player.hasKitchenObject())
             {
-                Debug.Log("Container has nothing");
+                //Container has something and player carrying something
+                if (player.GetKitchenObject().TryGetPlate(out PlateKitchenObject plateKitchenObject))
+                {
+                    if (plateKitchenObject.TryAddIngredient(GetKitchenObject().getKitchenObjSO()))
+                    {
+                        GetKitchenObject().destroySelf();
+                    }
+
+                }
             }
             else
             {

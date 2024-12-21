@@ -10,21 +10,41 @@ public class ClearCounter : BaseCounter
         {
             if (player.hasKitchenObject())
             {
+                //Container has nothing and player carrying something
                 player.GetKitchenObject().SetKitchenObjectParent(this);
             }
             else
             {
-                Debug.Log("Player has nothing");
+                //"Container has nothing and player carrying nothing
             }
         }
         else
         {
             if (player.hasKitchenObject())
             {
-                Debug.Log("Container has nothing");
+                //Container has something and player carrying something
+                if(player.GetKitchenObject().TryGetPlate(out PlateKitchenObject plateKitchenObject))
+                {
+                    if (plateKitchenObject.TryAddIngredient(GetKitchenObject().getKitchenObjSO()))
+                    {
+                        GetKitchenObject().destroySelf();
+                    }
+
+                }
+                else
+                {
+                    if(GetKitchenObject().TryGetPlate(out plateKitchenObject))
+                    {
+                        if (plateKitchenObject.TryAddIngredient(player.GetKitchenObject().getKitchenObjSO()))
+                        {
+                            player.GetKitchenObject().destroySelf();
+                        }
+                    }
+                }
             }
             else
             {
+               //Container has something and player dont carrying anything
                 GetKitchenObject().SetKitchenObjectParent(player);
             }
         }
