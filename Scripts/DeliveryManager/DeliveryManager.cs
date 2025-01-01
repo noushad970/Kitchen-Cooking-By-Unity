@@ -15,6 +15,7 @@ public class DeliveryManager : MonoBehaviour
     private void Awake()
     {
         Instance = this;
+      //  spawnRecipeTimer = spawnRecipeTimerMax; 
         WaitingRecipeSOList = new List<KitchenRecipeSO>();
     }
     private void Update()

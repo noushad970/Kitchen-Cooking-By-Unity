@@ -8,7 +8,7 @@ public class DeliveryManagerUI : MonoBehaviour
     [SerializeField] private Transform recipeTemplete;
     private void Awake()
     {
-        recipeTemplete.gameObject.SetActive(false);
+      //  recipeTemplete.gameObject.SetActive(false);
     }
     private void Start()
     {
@@ -40,6 +40,7 @@ public class DeliveryManagerUI : MonoBehaviour
         {
             Transform recipeTransform= Instantiate(recipeTemplete,container);
             recipeTemplete.gameObject.SetActive(true);
+            recipeTransform.GetComponent<DeliveryManagerSingleUI>().SetRecipeSO(recipeSO);
         }
     }
 }
